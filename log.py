@@ -30,3 +30,4 @@ class Log:
     def close():
         with open('log.txt', 'w') as log_file:
             json.dump(Log._chat_log, log_file, indent=4)
+            log_file.close()
