@@ -37,13 +37,11 @@ def user_login_registration():
         if log == 'Registered Successfully' or log == 'Logged in Successfully':
             validated = True
 
-    chat = Thread(target=start_chat)
-    chat.start()
+    start_chat()
 
 
 def start_chat():
     print('Enter private to start a private chat, otherwise enter any key to start group chat')
-
     chat_type = input()
 
     if chat_type == 'private':
@@ -77,21 +75,26 @@ def private_chat():
         else:
             print(is_valid)
 
-    receive_thread = Thread(target=receive_messages)
-    receive_thread.start()
-
     print(f"Started private chat with {private_chat_receiver}")
     print('Type messages below:')
 
-    send_messages()
-
-
-def group_chat():
     receive_thread = Thread(target=receive_messages)
     receive_thread.start()
 
-    print('Type messages below:')
     send_messages()
+
+    receive_thread.join()
+
+
+def group_chat():
+    print('Type messages below:')
+
+    receive_thread = Thread(target=receive_messages)
+    receive_thread.start()
+
+    send_messages()
+
+    receive_thread.join()
 
 
 def send_messages():
@@ -116,5 +119,4 @@ def receive_messages():
 
 if __name__ == '__main__':
     server.connect(('localhost', 2222))
-    user_login_registration_thread = Thread(target=user_login_registration)
-    user_login_registration_thread.start()
+    user_login_registration()
