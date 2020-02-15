@@ -97,13 +97,15 @@ def group_chat():
 
 
 def send_messages():
+    Log.initialize_file()
     while True:
         try:
             message = input()
             server.send(bytes(message, encoding))
-            #  Log.add(username, message)
             if message == 'logout':
+                Log.close()
                 break
+            Log.add(username, message)
         except:
             pass
 
@@ -116,7 +118,6 @@ def receive_messages():
                 server.close()
                 break
             print(message)
-            # Log.add(username, message)
         except:
             pass
 
