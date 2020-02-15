@@ -10,6 +10,8 @@ buffer = 2048
 encoding = "utf8"
 server = socket(AF_INET, SOCK_STREAM)
 
+#  TODO Add fernet (https://cryptography.io/en/latest/fernet/) message should be converted to bytes first
+
 
 def user_login_registration():
     global validated
@@ -37,7 +39,9 @@ def user_login_registration():
         if log == 'Registered Successfully' or log == 'Logged in Successfully':
             validated = True
 
+    Log.initialize_file()
     start_chat()
+    Log.close()
 
 
 def start_chat():
@@ -87,7 +91,7 @@ def private_chat():
 
 
 def group_chat():
-    print('Enter logout to logout.Type messages below:')
+    print('Enter logout to logout. Type messages below:')
 
     receive_thread = Thread(target=receive_messages)
     receive_thread.start()
@@ -97,13 +101,11 @@ def group_chat():
 
 
 def send_messages():
-    Log.initialize_file()
     while True:
         try:
             message = input()
             server.send(bytes(message, encoding))
             if message == 'logout':
-                Log.close()
                 break
             Log.add(username, message)
         except:
