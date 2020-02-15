@@ -54,5 +54,18 @@ class User:
         return False
 
     @staticmethod
-    def get_private_socket(current_user):
-        return User._users[current_user]['private_message_socket']
+    def private_message(current_user, message):
+        private_message_socket = User._users[current_user]['private_message_socket']
+        if private_message_socket is not None:
+            private_message_socket.send(bytes(current_user + '> ' + message, User._encoding))
+
+    @staticmethod
+    def logout(current_user):
+        user = User._users.get(current_user)
+        socket = user['socket']
+        for username in User._users.keys():
+            if socket == User._users[username]['private_message_socket']:
+                User._users[username]['private_message_socket'] = None
+
+        user['socket'] = None
+        user['private_message_socket'] = None

@@ -93,7 +93,6 @@ def group_chat():
     receive_thread.start()
 
     send_messages()
-
     receive_thread.join()
 
 
@@ -103,6 +102,8 @@ def send_messages():
             message = input()
             server.send(bytes(message, encoding))
             #  Log.add(username, message)
+            if message == 'logout':
+                break
         except:
             pass
 
@@ -111,6 +112,9 @@ def receive_messages():
     while True:
         try:
             message = server.recv(buffer).decode()
+            if message == 'logout':
+                server.close()
+                break
             print(message)
             # Log.add(username, message)
         except:
@@ -118,5 +122,5 @@ def receive_messages():
 
 
 if __name__ == '__main__':
-    server.connect(('localhost', 2222))
+    server.connect(('localhost', 3333))
     user_login_registration()

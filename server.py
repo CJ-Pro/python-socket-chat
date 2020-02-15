@@ -4,11 +4,12 @@ from user import User
 
 buffer = 2048
 server = socket(AF_INET, SOCK_STREAM)
-server.bind(('localhost', 2222))  # For internet use '0.0.0.0' with port 80
+server.bind(('localhost', 3333))  # For internet use '0.0.0.0' with port 80
 encoding = 'utf8'
 
 
 def start_server():
+
     while True:
         client, address = server.accept()
 
@@ -19,8 +20,8 @@ def start_server():
                 print(username + " has joined")
                 break
 
-        chat = Thread(target=start_chat, args=(client, username))
-        chat.start()
+        chat_thread = Thread(target=start_chat, args=(client, username))
+        chat_thread.start()
 
 
 def start_chat(client, current_user):
@@ -39,12 +40,22 @@ def private_chat(client, current_user):
 
     while True:
         message = client.recv(buffer).decode()
-        User.get_private_socket(current_user).send(bytes(current_user + '> ' + message, encoding))
+        if message == 'logout':
+            User.logout(current_user)
+            client.send(b'logout')
+            client.close()
+            break
+        User.private_message(current_user, message)
 
 
 def group_chat(client, current_user):
     while True:
         message = client.recv(buffer).decode()
+        if message == 'logout':
+            User.logout(current_user)
+            client.send(b'logout')
+            client.close()
+            break
         print(current_user + '> ' + message)
         User.broadcast(current_user, message)
 
@@ -55,4 +66,3 @@ if __name__ == '__main__':
     server_thread = Thread(target=start_server)
     server_thread.start()
     server_thread.join()
-    print('closed')
