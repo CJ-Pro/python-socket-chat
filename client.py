@@ -75,7 +75,7 @@ def private_chat():
         else:
             print(is_valid)
 
-    print(f"Started private chat with {private_chat_receiver}")
+    print(f"Started private chat with {private_chat_receiver}. Enter logout to logout")
     print('Type messages below:')
 
     receive_thread = Thread(target=receive_messages)
@@ -87,7 +87,7 @@ def private_chat():
 
 
 def group_chat():
-    print('Type messages below:')
+    print('Enter logout to logout.Type messages below:')
 
     receive_thread = Thread(target=receive_messages)
     receive_thread.start()
