@@ -1,6 +1,6 @@
 from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
-from log import Log
+from e2e import E2E
 
 validated = False
 user_valid = False
@@ -9,8 +9,6 @@ private_chat_receiver = None
 buffer = 2048
 encoding = "utf8"
 server = socket(AF_INET, SOCK_STREAM)
-
-#  TODO Add fernet (https://cryptography.io/en/latest/fernet/) message should be converted to bytes first
 
 
 def user_login_registration():
@@ -39,9 +37,7 @@ def user_login_registration():
         if log == 'Registered Successfully' or log == 'Logged in Successfully':
             validated = True
 
-    Log.initialize_file()
     start_chat()
-    Log.close()
 
 
 def start_chat():
@@ -104,26 +100,28 @@ def send_messages():
     while True:
         try:
             message = input()
-            server.send(bytes(message, encoding))
+            encrypted_message = E2E.encrypt(username + '> ' + message)
             if message == 'logout':
+                server.send(b'logout')
                 break
-            Log.add(username, message)
-        except:
-            pass
+            server.send(encrypted_message)
+        except Exception as e:
+            print(e)
 
 
 def receive_messages():
     while True:
         try:
-            message = server.recv(buffer).decode()
-            if message == 'logout':
+            message = server.recv(buffer)
+            if message == b'logout':
                 server.close()
                 break
-            print(message)
-        except:
-            pass
+            decrypted_message = E2E.decrypt(message).decode()
+            print(decrypted_message)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
-    server.connect(('localhost', 3333))
+    server.connect(('localhost', 4444))
     user_login_registration()

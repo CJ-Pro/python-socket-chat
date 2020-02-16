@@ -4,7 +4,7 @@ from user import User
 
 buffer = 2048
 server = socket(AF_INET, SOCK_STREAM)
-server.bind(('localhost', 3333))  # For internet use '0.0.0.0' with port 80
+server.bind(('localhost', 4444))  # For internet use '0.0.0.0' with port 80
 encoding = 'utf8'
 
 
@@ -32,32 +32,35 @@ def start_chat(client, current_user):
         group_chat(client, current_user)
 
 
+def receive_messages(client, current_user, is_group):
+    print('Messages are encrypted as shown:')
+
+    while True:
+        message = client.recv(buffer)
+        if message == b'logout':
+            User.logout(current_user)
+            client.send(b'logout')
+            client.close()
+            break
+        print(message)
+        if is_group:
+            User.broadcast(current_user, message)
+        else:
+            User.private_message(current_user, message)
+
+
 def private_chat(client, current_user):
     while True:
         private_chat_receiver = client.recv(buffer).decode()
         if User.is_valid(current_user, private_chat_receiver, client):
             break
 
-    while True:
-        message = client.recv(buffer).decode()
-        if message == 'logout':
-            User.logout(current_user)
-            client.send(b'logout')
-            client.close()
-            break
-        User.private_message(current_user, message)
+    receive_messages(client, current_user, False)
 
 
 def group_chat(client, current_user):
-    while True:
-        message = client.recv(buffer).decode()
-        if message == 'logout':
-            User.logout(current_user)
-            client.send(b'logout')
-            client.close()
-            break
-        print(current_user + '> ' + message)
-        User.broadcast(current_user, message)
+
+    receive_messages(client, current_user, True)
 
 
 if __name__ == '__main__':
@@ -66,3 +69,4 @@ if __name__ == '__main__':
     server_thread = Thread(target=start_server)
     server_thread.start()
     server_thread.join()
+    server.close()

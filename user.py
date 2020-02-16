@@ -33,7 +33,7 @@ class User:
             if user != current_user:
                 socket = User._users[user]['socket']
                 if socket is not None and socket not in User._private_sockets:
-                    socket.send(bytes(current_user+'> '+message, User._encoding))
+                    socket.send(message)
 
     @staticmethod
     def is_valid(current_user, private_chat_receiver, socket):
@@ -57,7 +57,7 @@ class User:
     def private_message(current_user, message):
         private_message_socket = User._users[current_user]['private_message_socket']
         if private_message_socket is not None:
-            private_message_socket.send(bytes(current_user + '> ' + message, User._encoding))
+            private_message_socket.send(message)
 
     @staticmethod
     def logout(current_user):
