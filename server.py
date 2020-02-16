@@ -1,4 +1,5 @@
 from socket import socket, AF_INET, SOCK_STREAM
+import platform
 from threading import Thread
 from user import User
 
@@ -17,7 +18,6 @@ def start_server():
             username = client.recv(buffer).decode()
             password = client.recv(buffer).decode()
             if User.user_validation(username, password, client):
-                print(username + " has joined")
                 break
 
         chat_thread = Thread(target=start_chat, args=(client, username))
@@ -33,7 +33,6 @@ def start_chat(client, current_user):
 
 
 def receive_messages(client, current_user, is_group):
-    print('Messages are encrypted as shown:')
 
     while True:
         message = client.recv(buffer)
@@ -64,6 +63,8 @@ def group_chat(client, current_user):
 
 
 if __name__ == '__main__':
+    print(f"Welcome to {platform.system()} chat")
+    print('All messages are encrypted on server.')
     print("Waiting for users to join...")
     server.listen()
     server_thread = Thread(target=start_server)
