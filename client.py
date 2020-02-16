@@ -1,5 +1,6 @@
 from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
+import platform
 from e2e import E2E
 
 validated = False
@@ -15,7 +16,7 @@ def user_login_registration():
     global validated
     global username
 
-    print("Welcome to Python Chat, Login or Register below:")
+    print(f"Welcome to {platform.system()} Python Chat, Login or Register below:")
 
     while validated is not True:
         username = input('Enter username:')
@@ -38,6 +39,9 @@ def user_login_registration():
             validated = True
 
     start_chat()
+    #  TODO separate admin chat
+    #  TODO Database plus file logs (Database then push to file)
+    #  TODO Broadcast Logout (public and private chat)
 
 
 def start_chat():

@@ -1,5 +1,4 @@
 from socket import socket, AF_INET, SOCK_STREAM
-import platform
 from threading import Thread
 from user import User
 
@@ -63,7 +62,6 @@ def group_chat(client, current_user):
 
 
 if __name__ == '__main__':
-    print(f"Welcome to {platform.system()} chat")
     print('All messages are encrypted on server.')
     print("Waiting for users to join...")
     server.listen()
