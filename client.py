@@ -16,17 +16,13 @@ def user_login_registration():
     global validated
     global username
 
-    print(f"Welcome to {platform.system()} Python Chat, Login or Register below:")
+    print("Welcome to " + platform.system() + " Python Chat, Login or Register below:")
 
     while validated is not True:
         username = input('Enter username:')
         password = input("Enter password (If no entry 'password' will be used):")
 
-        if username:
-            username = username[0].upper() + username[1:].lower()  # Capitalize first letter
-        else:
-            username = ' '
-
+        username = capitalize_first_letter(username)
         if not password:
             password = 'password'
 
@@ -64,12 +60,7 @@ def private_chat():
 
         private_chat_receiver = input('Enter username to send private messages to:')
 
-        if private_chat_receiver:
-            private_chat_receiver = private_chat_receiver[0].upper() + private_chat_receiver[1:].lower()  #
-            # Capitalize first letter
-        else:
-            private_chat_receiver = ' '
-
+        private_chat_receiver = capitalize_first_letter(private_chat_receiver)
         server.send(bytes(private_chat_receiver, encoding))
 
         is_valid = server.recv(buffer).decode()
@@ -82,7 +73,6 @@ def private_chat():
     print(f"Started private chat with {private_chat_receiver}. Enter logout to logout")
     print('Type messages below:')
 
-    receive_thread = Thread(target=receive_messages)
     receive_thread.start()
 
     send_messages()
@@ -93,11 +83,20 @@ def private_chat():
 def group_chat():
     print('Enter logout to logout. Type messages below:')
 
-    receive_thread = Thread(target=receive_messages)
     receive_thread.start()
 
     send_messages()
+
     receive_thread.join()
+
+
+def capitalize_first_letter(word):
+    if word:
+        word = word[0].upper() + word[1:].lower()
+    else:
+        word = ' '
+
+    return word
 
 
 def send_messages():
@@ -109,8 +108,8 @@ def send_messages():
                 server.send(b'logout')
                 break
             server.send(encrypted_message)
-        except Exception as e:
-            print(e)
+        except:
+            pass
 
 
 def receive_messages():
@@ -122,9 +121,11 @@ def receive_messages():
                 break
             decrypted_message = E2E.decrypt(message).decode()
             print(decrypted_message)
-        except Exception as e:
-            print(e)
+        except:
+            pass
 
+
+receive_thread = Thread(target=receive_messages)
 
 if __name__ == '__main__':
     server.connect(('localhost', 4444))
