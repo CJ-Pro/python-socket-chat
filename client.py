@@ -36,8 +36,6 @@ def user_login_registration():
 
     start_chat()
     #  TODO separate admin chat
-    #  TODO Database plus file logs (Database then push to file)
-    #  TODO Broadcast Logout (public and private chat)
 
 
 def start_chat():
@@ -128,5 +126,5 @@ def receive_messages():
 receive_thread = Thread(target=receive_messages)
 
 if __name__ == '__main__':
-    server.connect(('localhost', 4444))
+    server.connect(('localhost', 9686))
     user_login_registration()

@@ -4,7 +4,7 @@ from user import User
 
 buffer = 2048
 server = socket(AF_INET, SOCK_STREAM)
-server.bind(('localhost', 4444))  # For internet use '0.0.0.0' with port 80
+server.bind(('localhost', 9686))  # For internet use '0.0.0.0' with port 80
 encoding = 'utf8'
 
 
