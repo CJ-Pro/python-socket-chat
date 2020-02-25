@@ -1,4 +1,7 @@
-users = {}  # users is private to class
+import user_database
+
+
+users = {}
 sockets = {}
 private_sockets = {}
 encoding = "utf8"
@@ -8,6 +11,9 @@ class User:
 
     @staticmethod
     def user_validation(username, password, socket):
+
+        global users
+        users = user_database.initialize()
 
         if username in sockets.keys():
             socket.send(b'User already logged in')
@@ -28,6 +34,7 @@ class User:
                 return False
 
             users[username] = password
+            user_database.add(users)
             sockets[username] = socket
             socket.send(b'Registered Successfully')
             return True
