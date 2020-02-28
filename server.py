@@ -1,6 +1,6 @@
 from socket import socket, AF_INET, SOCK_STREAM
 from threading import Thread
-from user import User
+from user import User, sockets
 
 buffer = 2048
 server = socket(AF_INET, SOCK_STREAM)
@@ -19,6 +19,7 @@ def start_server():
             if User.user_validation(username, password, client):
                 break
 
+        sockets[username] = client
         chat_thread = Thread(target=start_chat, args=(client, username))
         chat_thread.start()
 
@@ -31,20 +32,32 @@ def start_chat(client, current_user):
         group_chat(client, current_user)
 
 
+def execute_admin_functions(client, message):
+    print(message)
+
+
 def receive_messages(client, current_user, is_group):
 
     while True:
-        message = client.recv(buffer)
-        if message == b'logout':
-            User.logout(current_user)
-            client.send(b'logout')
-            client.close()
-            break
-        print(message)
-        if is_group:
-            User.broadcast(current_user, message)
-        else:
-            User.private_message(current_user, message)
+        try:
+            message = client.recv(buffer)
+            if message == b'logout':
+                User.logout(current_user)
+                client.send(b'logout')
+                client.close()
+                break
+
+            if current_user == 'Admin':
+                execute_admin_functions(client, message)
+            else:
+                if len(message.decode()) > 0:
+                    print(message)
+                if is_group:
+                    User.broadcast(current_user, message)
+                else:
+                    User.private_message(current_user, message)
+        except:
+            pass
 
 
 def private_chat(client, current_user):

@@ -35,7 +35,6 @@ def user_login_registration():
             validated = True
 
     start_chat()
-    #  TODO separate admin chat
 
 
 def start_chat():
@@ -47,7 +46,10 @@ def start_chat():
         private_chat()
     else:
         server.send(b'group')
-        group_chat()
+        if username == 'Admin':
+            admin_chat()
+        else:
+            group_chat()
 
 
 def private_chat():
@@ -72,19 +74,15 @@ def private_chat():
     print('Type messages below:')
 
     receive_thread.start()
-
     send_messages()
-
     receive_thread.join()
 
 
 def group_chat():
-    print('Enter logout to logout. Type messages below:')
+    print('Group Chat started. Enter logout to logout. Type messages below:')
 
     receive_thread.start()
-
     send_messages()
-
     receive_thread.join()
 
 
@@ -103,6 +101,8 @@ def send_messages():
             message = input()
             encrypted_message = E2E.encrypt(username + '> ' + message)
             if message == 'logout':
+                encrypted_logout_message = E2E.encrypt(username + ' has logged out from python chat')
+                server.send(encrypted_logout_message)
                 server.send(b'logout')
                 break
             server.send(encrypted_message)
@@ -117,13 +117,41 @@ def receive_messages():
             if message == b'logout':
                 server.close()
                 break
-            decrypted_message = E2E.decrypt(message).decode()
-            print(decrypted_message)
+            if username == 'Admin' and b'logged in' in message or b'warn' in message \
+                    or b'kick' in message or b'ban' in message:
+                print(message.decode())
+            else:
+                decrypted_message = E2E.decrypt(message).decode()
+                print(decrypted_message)
+        except:
+            pass
+
+
+def admin_chat():
+
+    receive_thread.start()
+    send_admin_messages()
+    receive_thread.join()
+
+
+def send_admin_messages():
+    while True:
+        try:
+            message = input()
+            if message == 'logout':
+                server.send(b'logout')
+                break
+            elif 'logged in' in message or 'warn' in message or 'kick' in message or 'ban' in message:
+                server.send(message.encode())
+            else:
+                encrypted_message = E2E.encrypt(username + '> ' + message)
+                server.send(encrypted_message)
         except:
             pass
 
 
 receive_thread = Thread(target=receive_messages)
+
 
 if __name__ == '__main__':
     server.connect(('localhost', 9686))
