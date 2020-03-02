@@ -4,6 +4,8 @@ import pickle
 
 e2e = Fernet(b'M1FvtMIU5xp4vQ7pwFMzh8qJ-5xHhTl7V6csoxJvy8g=')
 
+"""File database system for banned users and stored users, also encrypted"""
+
 
 def add_ban(banned_users):
     with open('banned_users.txt', 'w') as banned_database:

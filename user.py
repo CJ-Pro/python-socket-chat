@@ -92,6 +92,7 @@ class User:
     def get_socket(user):
         return sockets.get(user)
 
+    """Remove user from all stored instances"""
     @staticmethod
     def logout(current_user):
 

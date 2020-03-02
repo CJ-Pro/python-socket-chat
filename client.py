@@ -13,6 +13,10 @@ encoding = "utf8"
 server = socket(AF_INET, SOCK_STREAM)
 
 
+"""User will login if an account exists or they are registered automatically, The usernames are consistent as the 
+first letters of the names are capitalized with the rest lower """
+
+
 def user_login_registration():
     global validated
     global username
@@ -38,6 +42,9 @@ def user_login_registration():
     start_chat()
 
 
+"""Users can choose to start a private or group chat session"""
+
+
 def start_chat():
     print('Enter private to start a private chat, otherwise enter any key to start group chat')
     chat_type = input()
@@ -51,6 +58,9 @@ def start_chat():
             admin_chat()
         else:
             group_chat()
+
+
+"""The private chat asks for a logged in user, if none is found, no session will be started"""
 
 
 def private_chat():
@@ -87,6 +97,9 @@ def group_chat():
     receive_thread.join()
 
 
+"""Function to allow consistency in username"""
+
+
 def capitalize_first_letter(word):
     if word:
         word = word[0].upper() + word[1:].lower()
@@ -94,6 +107,9 @@ def capitalize_first_letter(word):
         word = ' '
 
     return word
+
+
+"""Messages are encrypted before sending to the server"""
 
 
 def send_messages():
@@ -115,6 +131,9 @@ def send_messages():
 
         except:
             pass
+
+
+"""Also messages are decrypted when received on client, showing end to end encryption"""
 
 
 def receive_messages():
@@ -146,6 +165,9 @@ def admin_chat():
     receive_thread.start()
     send_admin_messages()
     receive_thread.join()
+
+
+"""Admin has a separate function to send messages with priviledges"""
 
 
 def send_admin_messages():

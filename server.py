@@ -8,6 +8,9 @@ server.bind(('localhost', 9686))  # For internet use '0.0.0.0' with port 80
 encoding = 'utf8'
 
 
+"""Start server and validate users"""
+
+
 def start_server():
 
     while True:
@@ -24,12 +27,19 @@ def start_server():
         chat_thread.start()
 
 
+"""Start group or private chat receiver on server"""
+
+
 def start_chat(client, current_user):
     chat_type = client.recv(buffer).decode()
     if chat_type == 'private':
         private_chat(client, current_user)
     else:
         group_chat(client, current_user)
+
+
+
+"""Special server admin functions"""
 
 
 def execute_admin_functions(client, message):
