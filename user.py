@@ -3,6 +3,7 @@ import user_database
 users = {}
 sockets = {}
 private_receiver_sockets = {}
+banned_users = []
 private_user_sockets = []
 encoding = "utf8"
 
@@ -13,7 +14,13 @@ class User:
     def user_validation(username, password, socket):
 
         global users
+        global banned_users
         users = user_database.initialize()
+        banned_users = user_database.initialize_banned()
+
+        if username in banned_users:
+            socket.send(b'You are permanently banned')
+            return False
 
         if username in sockets.keys():
             socket.send(b'User already logged in')
@@ -36,6 +43,12 @@ class User:
             user_database.add(users)
             socket.send(b'Registered Successfully')
             return True
+
+    @staticmethod
+    def ban(username):
+        User.logout(username)
+        banned_users.append(username)
+        user_database.add_ban(banned_users)
 
     @staticmethod
     def broadcast(current_user, message):

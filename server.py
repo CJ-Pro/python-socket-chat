@@ -54,6 +54,11 @@ def execute_admin_functions(client, message):
             User.broadcast('Admin', bytes('Admin> ' + user + ' was kicked out', 'utf8'))
             User.logout(user)
 
+        elif 'ban' in decoded_message and user in sockets:
+            users_socket.send(b'logout')
+            User.broadcast('Admin', bytes('Admin> ' + user + ' was banned', 'utf8'))
+            User.ban(user)
+
     else:
         User.broadcast('Admin', message)
 
