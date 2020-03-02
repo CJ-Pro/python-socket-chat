@@ -33,7 +33,29 @@ def start_chat(client, current_user):
 
 
 def execute_admin_functions(client, message):
-    print(message)
+
+    decoded_message = message.decode()
+
+    if message == b'view logged in users':
+        logged_in_users = User.get_logged_in_users()
+        message = 'logged in users: ' + logged_in_users
+        client.send(message.encode())
+
+    elif 'ban' in decoded_message or 'warn' in decoded_message or 'kick' in decoded_message:
+
+        user = decoded_message.split()[0]
+        users_socket = User.get_socket(user)
+
+        if 'warn' in decoded_message and user in sockets:
+            User.broadcast('Admin', bytes('Admin> ' + user + ' was warned', 'utf8'))
+
+        elif 'kick' in decoded_message and user in sockets:
+            users_socket.send(b'logout')
+            User.broadcast('Admin', bytes('Admin> ' + user + ' was kicked out', 'utf8'))
+            User.logout(user)
+
+    else:
+        User.broadcast('Admin', message)
 
 
 def receive_messages(client, current_user, is_group):
@@ -42,9 +64,8 @@ def receive_messages(client, current_user, is_group):
         try:
             message = client.recv(buffer)
             if message == b'logout':
-                User.logout(current_user)
                 client.send(b'logout')
-                client.close()
+                User.logout(current_user)
                 break
 
             if current_user == 'Admin':

@@ -7,6 +7,7 @@ validated = False
 user_valid = False
 username = None
 private_chat_receiver = None
+logged_in = True
 buffer = 2048
 encoding = "utf8"
 server = socket(AF_INET, SOCK_STREAM)
@@ -96,29 +97,42 @@ def capitalize_first_letter(word):
 
 
 def send_messages():
-    while True:
+
+    global logged_in
+
+    while logged_in:
         try:
             message = input()
             encrypted_message = E2E.encrypt(username + '> ' + message)
+
             if message == 'logout':
                 encrypted_logout_message = E2E.encrypt(username + ' has logged out from python chat')
                 server.send(encrypted_logout_message)
                 server.send(b'logout')
                 break
+
             server.send(encrypted_message)
+
         except:
             pass
 
 
 def receive_messages():
+
+    global logged_in
+
     while True:
         try:
             message = server.recv(buffer)
             if message == b'logout':
+                logged_in = False
+                print('<-Enter to dismiss')
                 server.close()
                 break
-            if username == 'Admin' and b'logged in' in message or b'warn' in message \
-                    or b'kick' in message or b'ban' in message:
+
+            if username == 'Admin' and b'logged in users:' in message:
+                print(message.decode())
+            elif b'Admin' in message:
                 print(message.decode())
             else:
                 decrypted_message = E2E.decrypt(message).decode()
@@ -135,17 +149,27 @@ def admin_chat():
 
 
 def send_admin_messages():
+
+    print('Admin functions: view logged in users, warn, kick, ban')
+
     while True:
         try:
             message = input()
             if message == 'logout':
                 server.send(b'logout')
                 break
-            elif 'logged in' in message or 'warn' in message or 'kick' in message or 'ban' in message:
+
+            elif message == 'view logged in users':
                 server.send(message.encode())
+
+            elif message == 'ban' or message == 'warn' or message == 'kick':
+                message = capitalize_first_letter(input('Which User?')) + ' ' + message
+                server.send(message.encode())
+
             else:
                 encrypted_message = E2E.encrypt(username + '> ' + message)
                 server.send(encrypted_message)
+
         except:
             pass
 

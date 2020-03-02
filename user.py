@@ -71,9 +71,20 @@ class User:
             private_message_socket.send(message)
 
     @staticmethod
+    def get_logged_in_users():
+        logged_in_list = [user for user in sockets]
+        return ' '.join(logged_in_list)
+
+    @staticmethod
+    def get_socket(user):
+        return sockets.get(user)
+
+    @staticmethod
     def logout(current_user):
 
         socket = sockets[current_user]
+
+        socket.close()
 
         if socket in private_user_sockets:
             private_user_sockets.remove(socket)
